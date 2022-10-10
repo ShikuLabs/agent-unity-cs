@@ -30,10 +30,10 @@ namespace IC
         internal const StateCode SC_INTERNAL_ERR = -2;
         internal const StateCode SC_ERR_INFO_OVERFLOW = -3;
 
-        [DllImport("/Users/allen/agent-unity-laboratory/src/ICAgentFFI/ic-agent-ffi.dylib", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
         internal static extern StateCode principal_management_canister(byte[] out_arr, out UInt32 out_arr_len, in UInt32 arr_len);
 
-        [DllImport("/Users/allen/agent-unity-laboratory/src/ICAgentFFI/ic-agent-ffi.dylib", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
         internal static extern StateCode principal_anonymous(byte[] out_arr, out UInt32 out_arr_len, in UInt32 arr_len);
     }
 }
