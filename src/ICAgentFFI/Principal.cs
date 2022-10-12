@@ -1,9 +1,10 @@
+using System.Numerics;
 using System.Runtime.InteropServices;
 using StateCode = System.Int32;
 
 namespace ICAgentFFI
 {
-    public class Principal
+    public class Principal: IEquatable<Principal>
     {
         private const byte NullTerminated = 0;
         
@@ -17,7 +18,7 @@ namespace ICAgentFFI
         {
             var bytes = new byte[arrLen];
             Array.Copy(arr, bytes, arrLen);
-            this.Bytes = bytes;
+            Bytes = bytes;
         }
 
         public static Principal ManagementCanister()
@@ -179,6 +180,24 @@ namespace ICAgentFFI
                 default:
                     throw new Exception("Unknown: The StateCode returned is unexpected.");
             }
+        }
+
+        public bool Equals(Principal? principal)
+        {
+            if (principal == null) return false;
+
+            if (GetType() != principal.GetType()) return false;
+            
+            if (ReferenceEquals(this, principal)) return true;
+
+            return Enumerable.SequenceEqual(Bytes, principal.Bytes);
+        }
+
+        public override bool Equals(object? obj) => Equals(obj as Principal);
+
+        public override int GetHashCode()
+        {
+            return new BigInteger(Bytes).GetHashCode();
         }
     }
 

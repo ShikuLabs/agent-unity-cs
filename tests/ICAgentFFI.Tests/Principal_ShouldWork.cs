@@ -77,5 +77,16 @@ namespace ICAgentFFI.Tests
             
             Assert.Equal(principal.ToString(), TEXT_EXPECTED);
         }
+        
+        [Fact]
+        public void Equal_ShouldWork()
+        {
+            var anonymous01 = Principal.Anonymous();
+            var anonymous02 = Principal.Anonymous();
+            Assert.Equal(anonymous01, anonymous02);
+
+            var managementCanister = Principal.ManagementCanister();
+            Assert.NotEqual(anonymous01, managementCanister);
+        }
     }
 }
