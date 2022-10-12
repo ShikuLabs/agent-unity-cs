@@ -4,13 +4,13 @@ using StateCode = System.Int32;
 
 namespace ICAgentFFI
 {
-    public class Principal: IEquatable<Principal>
+    public class Principal : IEquatable<Principal>
     {
         private const byte NullTerminated = 0;
-        
-        private const UInt32 OutArrSize = 32;
-        private const UInt32 OutTextSize = 128;
-        private const UInt32 OutErrInfoSize = 256;
+
+        private static UInt32 OutArrSize = 32;
+        private static UInt32 OutTextSize = 128;
+        private static UInt32 OutErrInfoSize = 256;
 
         public byte[] Bytes { get; }
 
@@ -32,16 +32,16 @@ namespace ICAgentFFI
                 case FromRust.ScOk:
                     return new Principal(outArr, outArrLen);
                 case FromRust.ScDataOverflow:
-                    throw new Exception("Data Overflow: Unable to take off the data of principal bytes.");
+                    throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
                 default:
-                    throw new Exception("Unknown: The StateCode returned is unexpected.");
+                    throw new UnknownException("Unknown: The StateCode returned is unexpected.");
             }
         }
 
         public static Principal SelfAuthenticating(byte[] publicKey)
         {
             byte[] outArr = new byte[OutArrSize];
-            
+
             var sc = FromRust.principal_self_authenticating(
                 outArr,
                 out UInt32 outArrLen,
@@ -49,36 +49,36 @@ namespace ICAgentFFI
                 publicKey,
                 (UInt32)publicKey.Length
             );
-            
+
             switch (sc)
             {
                 case FromRust.ScOk:
                     return new Principal(outArr, outArrLen);
                 case FromRust.ScDataOverflow:
-                    throw new Exception("Data Overflow: Unable to take off the data of principal bytes.");
+                    throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
                 default:
-                    throw new Exception("Unknown: The StateCode returned is unexpected.");
+                    throw new UnknownException("Unknown: The StateCode returned is unexpected.");
             }
         }
 
         public static Principal Anonymous()
         {
             byte[] outArr = new byte[OutArrSize];
-            
+
             var sc = FromRust.principal_anonymous(
                 outArr,
                 out UInt32 outArrLen,
                 (UInt32)outArr.Length
             );
-            
+
             switch (sc)
             {
                 case FromRust.ScOk:
                     return new Principal(outArr, outArrLen);
                 case FromRust.ScDataOverflow:
-                    throw new Exception("Data Overflow: Unable to take off the data of principal bytes.");
+                    throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
                 default:
-                    throw new Exception("Unknown: The StateCode returned is unexpected.");
+                    throw new UnknownException("Unknown: The StateCode returned is unexpected.");
             }
         }
 
@@ -102,15 +102,15 @@ namespace ICAgentFFI
                 case FromRust.ScOk:
                     return new Principal(outArr, outArrLen);
                 case FromRust.ScDataOverflow:
-                    throw new Exception("Data Overflow: Unable to take off the data of principal bytes.");
+                    throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
                 case FromRust.ScInternalErr:
                     var len = Array.IndexOf(outErrInfo, NullTerminated);
                     var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
-                    throw new Exception($"Internal: {errInfo}");
+                    throw new InternalErrorException($"Internal: {errInfo}");
                 case FromRust.ScErrInfoOverflow:
-                    throw new Exception("ErrInfo Overflow: Unable to take off the data of error.");
+                    throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
                 default:
-                    throw new Exception("Unknown: The StateCode returned is unexpected.");
+                    throw new UnknownException("Unknown: The StateCode returned is unexpected.");
             }
         }
 
@@ -118,7 +118,7 @@ namespace ICAgentFFI
         {
             byte[] outArr = new byte[OutArrSize];
             byte[] outErrInfo = new byte[OutErrInfoSize];
-            
+
             var sc = FromRust.principal_from_text(
                 text,
                 outArr,
@@ -127,21 +127,21 @@ namespace ICAgentFFI
                 outErrInfo,
                 (UInt32)outErrInfo.Length
             );
-            
+
             switch (sc)
             {
                 case FromRust.ScOk:
                     return new Principal(outArr, outArrLen);
                 case FromRust.ScDataOverflow:
-                    throw new Exception("Data Overflow: Unable to take off the data of principal bytes.");
+                    throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
                 case FromRust.ScInternalErr:
                     var len = Array.IndexOf(outErrInfo, NullTerminated);
                     var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
-                    throw new Exception($"Internal: {errInfo}");
+                    throw new InternalErrorException($"Internal: {errInfo}");
                 case FromRust.ScErrInfoOverflow:
-                    throw new Exception("ErrInfo Overflow: Unable to take off the data of error.");
+                    throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
                 default:
-                    throw new Exception("Unknown: The StateCode returned is unexpected.");
+                    throw new UnknownException("Unknown: The StateCode returned is unexpected.");
             }
         }
 
@@ -158,7 +158,7 @@ namespace ICAgentFFI
                 outErrInfo,
                 (UInt32)outErrInfo.Length
             );
-            
+
             switch (sc)
             {
                 case FromRust.ScOk:
@@ -168,17 +168,17 @@ namespace ICAgentFFI
                     return principalText;
                 }
                 case FromRust.ScDataOverflow:
-                    throw new Exception("Data Overflow: Unable to take off the data of principal text.");
+                    throw new DataOverflowException("Data Overflow: Unable to take off the data of principal text.");
                 case FromRust.ScInternalErr:
                 {
                     var len = Array.IndexOf(outErrInfo, NullTerminated);
                     var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
-                    throw new Exception($"Internal: {errInfo}");
+                    throw new InternalErrorException($"Internal: {errInfo}");
                 }
                 case FromRust.ScErrInfoOverflow:
-                    throw new Exception("ErrInfo Overflow: Unable to take off the data of error.");
+                    throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
                 default:
-                    throw new Exception("Unknown: The StateCode returned is unexpected.");
+                    throw new UnknownException("Unknown: The StateCode returned is unexpected.");
             }
         }
 
@@ -187,7 +187,7 @@ namespace ICAgentFFI
             if (principal == null) return false;
 
             if (GetType() != principal.GetType()) return false;
-            
+
             if (ReferenceEquals(this, principal)) return true;
 
             return Enumerable.SequenceEqual(Bytes, principal.Bytes);
@@ -198,6 +198,66 @@ namespace ICAgentFFI
         public override int GetHashCode()
         {
             return new BigInteger(Bytes).GetHashCode();
+        }
+    }
+
+    public class DataOverflowException : Exception
+    {
+        public DataOverflowException()
+        {
+        }
+
+        public DataOverflowException(string message) : base(message)
+        {
+        }
+
+        public DataOverflowException(string message, Exception inner) : base(message, inner)
+        {
+        }
+    }
+
+    public class InternalErrorException : Exception
+    {
+        public InternalErrorException()
+        {
+        }
+
+        public InternalErrorException(string message) : base(message)
+        {
+        }
+
+        public InternalErrorException(string message, Exception inner) : base(message, inner)
+        {
+        }
+    }
+
+    public class ErrInfoOverflowException : Exception
+    {
+        public ErrInfoOverflowException()
+        {
+        }
+
+        public ErrInfoOverflowException(string message) : base(message)
+        {
+        }
+
+        public ErrInfoOverflowException(string message, Exception inner) : base(message, inner)
+        {
+        }
+    }
+
+    public class UnknownException : Exception
+    {
+        public UnknownException()
+        {
+        }
+
+        public UnknownException(string message) : base(message)
+        {
+        }
+
+        public UnknownException(string message, Exception inner) : base(message, inner)
+        {
         }
     }
 
