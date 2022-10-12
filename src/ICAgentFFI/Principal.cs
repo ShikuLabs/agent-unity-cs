@@ -107,8 +107,7 @@ namespace ICAgentFFI
                     var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
                     throw new Exception($"Internal: {errInfo}");
                 case FromRust.ScErrInfoOverflow:
-                    throw new Exception(
-                        $"ErrInfo Overflow: The length of ErrInfo is bigger than `ERR_INFO_SIZE({outErrInfo.Length})`.");
+                    throw new Exception("ErrInfo Overflow: Unable to take off the data of error.");
                 default:
                     throw new Exception("Unknown: The StateCode returned is unexpected.");
             }
@@ -139,8 +138,7 @@ namespace ICAgentFFI
                     var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
                     throw new Exception($"Internal: {errInfo}");
                 case FromRust.ScErrInfoOverflow:
-                    throw new Exception(
-                        $"ErrInfo Overflow: The length of ErrInfo is bigger than `ERR_INFO_SIZE({outErrInfo.Length})`.");
+                    throw new Exception("ErrInfo Overflow: Unable to take off the data of error.");
                 default:
                     throw new Exception("Unknown: The StateCode returned is unexpected.");
             }
@@ -177,8 +175,7 @@ namespace ICAgentFFI
                     throw new Exception($"Internal: {errInfo}");
                 }
                 case FromRust.ScErrInfoOverflow:
-                    throw new Exception(
-                        $"ErrInfo Overflow: Unable to take off the data of error.");
+                    throw new Exception("ErrInfo Overflow: Unable to take off the data of error.");
                 default:
                     throw new Exception("Unknown: The StateCode returned is unexpected.");
             }
