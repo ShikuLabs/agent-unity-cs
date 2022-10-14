@@ -2,8 +2,6 @@ using System.Reflection;
 
 namespace ICAgentFFI.Tests
 {
-    using ICAgentFFI;
-
     public class PrincipalTest
     {
         [Fact]

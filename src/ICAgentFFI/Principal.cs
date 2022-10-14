@@ -1,9 +1,8 @@
+namespace ICAgentFFI;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using StateCode = System.Int32;
 
-namespace ICAgentFFI
-{
     public class Principal : IEquatable<Principal>
     {
         private const byte NullTerminated = 0;
@@ -199,6 +198,69 @@ namespace ICAgentFFI
         {
             return new BigInteger(Bytes).GetHashCode();
         }
+
+        internal static class FromRust
+        {
+            internal const StateCode ScOk = 0;
+            internal const StateCode ScDataOverflow = -1;
+            internal const StateCode ScInternalErr = -2;
+            internal const StateCode ScErrInfoOverflow = -3;
+
+            [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+            internal static extern StateCode principal_management_canister(
+                byte[] outArr,
+                out UInt32 outArrLen,
+                UInt32 arrSize
+            );
+
+            [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+            internal static extern StateCode principal_self_authenticating(
+                byte[] outArr,
+                out UInt32 outArrLen,
+                UInt32 arrSize,
+                byte[] publicKey,
+                UInt32 publicKeySize
+            );
+
+            [DllImport("ic-agent-ffi",
+                CallingConvention = CallingConvention.Cdecl)]
+            internal static extern StateCode principal_anonymous(
+                byte[] outArr,
+                out UInt32 outArrLen,
+                UInt32 arrLen
+            );
+
+            [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+            internal static extern StateCode principal_from_bytes(
+                byte[] bytes,
+                UInt32 bytesSize,
+                byte[] outArr,
+                out UInt32 outArrLen,
+                UInt32 arrSize,
+                byte[] outErrInfo,
+                UInt32 arrInfoSize
+            );
+
+            [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+            internal static extern StateCode principal_from_text(
+                string text,
+                byte[] outArr,
+                out UInt32 outArrLen,
+                UInt32 arrSize,
+                byte[] outErrInfo,
+                UInt32 errInfoSize
+            );
+
+            [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+            internal static extern StateCode principal_to_text(
+                byte[] bytes,
+                UInt32 bytesSize,
+                byte[] outText,
+                UInt32 textSize,
+                byte[] outErrInfo,
+                UInt32 errInfoSize
+            );
+        }
     }
 
     public class DataOverflowException : Exception
@@ -260,67 +322,3 @@ namespace ICAgentFFI
         {
         }
     }
-
-    internal static class FromRust
-    {
-        internal const StateCode ScOk = 0;
-        internal const StateCode ScDataOverflow = -1;
-        internal const StateCode ScInternalErr = -2;
-        internal const StateCode ScErrInfoOverflow = -3;
-
-        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern StateCode principal_management_canister(
-            byte[] outArr,
-            out UInt32 outArrLen,
-            UInt32 arrSize
-        );
-
-        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern StateCode principal_self_authenticating(
-            byte[] outArr,
-            out UInt32 outArrLen,
-            UInt32 arrSize,
-            byte[] publicKey,
-            UInt32 publicKeySize
-        );
-
-        [DllImport("ic-agent-ffi",
-            CallingConvention = CallingConvention.Cdecl)]
-        internal static extern StateCode principal_anonymous(
-            byte[] outArr,
-            out UInt32 outArrLen,
-            UInt32 arrLen
-        );
-
-        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern StateCode principal_from_bytes(
-            byte[] bytes,
-            UInt32 bytesSize,
-            byte[] outArr,
-            out UInt32 outArrLen,
-            UInt32 arrSize,
-            byte[] outErrInfo,
-            UInt32 arrInfoSize
-        );
-
-        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern StateCode principal_from_text(
-            string text,
-            byte[] outArr,
-            out UInt32 outArrLen,
-            UInt32 arrSize,
-            byte[] outErrInfo,
-            UInt32 errInfoSize
-        );
-
-        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern StateCode principal_to_text(
-            byte[] bytes,
-            UInt32 bytesSize,
-            byte[] outText,
-            UInt32 textSize,
-            byte[] outErrInfo,
-            UInt32 errInfoSize
-        );
-    }
-}
