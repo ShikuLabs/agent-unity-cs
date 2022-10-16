@@ -14,9 +14,9 @@ public class Principal : IEquatable<Principal>
         Bytes = bytes;
     }
 
-    public static Principal ManagementCanister()
+    public static Principal ManagementCanister(uint outArrSize = Config.OutArrSize)
     {
-        byte[] outArr = new byte[Config.OutArrSize];
+        byte[] outArr = new byte[outArrSize];
 
         var sc = FromRust.principal_management_canister(outArr, out UInt32 outArrLen, (UInt32)outArr.Length);
 
@@ -31,9 +31,9 @@ public class Principal : IEquatable<Principal>
         }
     }
 
-    public static Principal SelfAuthenticating(byte[] publicKey)
+    public static Principal SelfAuthenticating(byte[] publicKey, uint outArrSize = Config.OutArrSize)
     {
-        byte[] outArr = new byte[Config.OutArrSize];
+        byte[] outArr = new byte[outArrSize];
 
         var sc = FromRust.principal_self_authenticating(
             outArr,
@@ -54,9 +54,9 @@ public class Principal : IEquatable<Principal>
         }
     }
 
-    public static Principal Anonymous()
+    public static Principal Anonymous(uint outArrSize = Config.OutArrSize)
     {
-        byte[] outArr = new byte[Config.OutArrSize];
+        byte[] outArr = new byte[outArrSize];
 
         var sc = FromRust.principal_anonymous(
             outArr,
@@ -75,10 +75,14 @@ public class Principal : IEquatable<Principal>
         }
     }
 
-    public static Principal FromBytes(byte[] bytes)
+    public static Principal FromBytes(
+        byte[] bytes,
+        uint outArrSize = Config.OutArrSize,
+        uint outErrInfoSize = Config.OutErrInfoSize
+    )
     {
-        byte[] outArr = new byte[Config.OutArrSize];
-        byte[] outErrInfo = new byte[Config.OutErrInfoSize];
+        byte[] outArr = new byte[outArrSize];
+        byte[] outErrInfo = new byte[outErrInfoSize];
 
         var sc = FromRust.principal_from_bytes(
             bytes,
@@ -107,9 +111,13 @@ public class Principal : IEquatable<Principal>
         }
     }
 
-    public static Principal FromText(string text)
+    public static Principal FromText(
+        string text,
+        uint outArrSize = Config.OutArrSize,
+        uint outErrInfoSize = Config.OutErrInfoSize
+    )
     {
-        byte[] outArr = new byte[Config.OutArrSize];
+        byte[] outArr = new byte[outArrSize];
         byte[] outErrInfo = new byte[Config.OutErrInfoSize];
 
         var sc = FromRust.principal_from_text(
@@ -138,10 +146,13 @@ public class Principal : IEquatable<Principal>
         }
     }
 
-    public override string ToString()
+    public string ToText(
+        uint outTextSize = Config.OutTextSize,
+        uint outErrInfoSize = Config.OutErrInfoSize
+    )
     {
-        byte[] outText = new byte[Config.OutTextSize];
-        byte[] outErrInfo = new byte[Config.OutErrInfoSize];
+        byte[] outText = new byte[outTextSize];
+        byte[] outErrInfo = new byte[outErrInfoSize];
 
         var sc = FromRust.principal_to_text(
             Bytes,

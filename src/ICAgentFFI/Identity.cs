@@ -57,6 +57,30 @@ public class Identity
                 throw new UnknownException("Unknown: The StateCode returned is unexpected.");
         }
     }
+    
+    public static Identity Secp256k1Random()
+    {
+        var outFptr = new IntPtr[2];
+        var outErrInfo = new byte[Config.OutErrInfoSize];
+
+        var sc = FromRust.identity_secp256k1_random(outFptr, outErrInfo, (UInt32)outErrInfo.Length);
+        
+        switch (sc)
+        {
+            case StateCode.Ok:
+                return new Identity(outFptr, IdentityType.Secp256K1);
+            case StateCode.DataOverflow:
+                throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
+            case StateCode.InternalErr:
+                var len = Array.IndexOf(outErrInfo, Config.NullTerminated);
+                var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
+                throw new InternalErrorException($"Internal: {errInfo}");
+            case StateCode.ErrInfoOverflow:
+                throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
+            default:
+                throw new UnknownException("Unknown: The StateCode returned is unexpected.");
+        }
+    }
 
     public Principal Sender()
     {
