@@ -2,19 +2,12 @@ namespace ICAgentFFI;
 
 using System.Numerics;
 using System.Runtime.InteropServices;
-using StateCode = System.Int32;
 
 public class Principal : IEquatable<Principal>
 {
-    private const byte NullTerminated = 0;
-
-    private static UInt32 OutArrSize = 32;
-    private static UInt32 OutTextSize = 128;
-    private static UInt32 OutErrInfoSize = 256;
-
     public byte[] Bytes { get; }
 
-    Principal(byte[] arr, UInt32 arrLen)
+    internal Principal(byte[] arr, UInt32 arrLen)
     {
         var bytes = new byte[arrLen];
         Array.Copy(arr, bytes, arrLen);
@@ -23,15 +16,15 @@ public class Principal : IEquatable<Principal>
 
     public static Principal ManagementCanister()
     {
-        byte[] outArr = new byte[OutArrSize];
+        byte[] outArr = new byte[Config.OutArrSize];
 
         var sc = FromRust.principal_management_canister(outArr, out UInt32 outArrLen, (UInt32)outArr.Length);
 
         switch (sc)
         {
-            case FromRust.ScOk:
+            case StateCode.Ok:
                 return new Principal(outArr, outArrLen);
-            case FromRust.ScDataOverflow:
+            case StateCode.DataOverflow:
                 throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
             default:
                 throw new UnknownException("Unknown: The StateCode returned is unexpected.");
@@ -40,7 +33,7 @@ public class Principal : IEquatable<Principal>
 
     public static Principal SelfAuthenticating(byte[] publicKey)
     {
-        byte[] outArr = new byte[OutArrSize];
+        byte[] outArr = new byte[Config.OutArrSize];
 
         var sc = FromRust.principal_self_authenticating(
             outArr,
@@ -52,9 +45,9 @@ public class Principal : IEquatable<Principal>
 
         switch (sc)
         {
-            case FromRust.ScOk:
+            case StateCode.Ok:
                 return new Principal(outArr, outArrLen);
-            case FromRust.ScDataOverflow:
+            case StateCode.DataOverflow:
                 throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
             default:
                 throw new UnknownException("Unknown: The StateCode returned is unexpected.");
@@ -63,7 +56,7 @@ public class Principal : IEquatable<Principal>
 
     public static Principal Anonymous()
     {
-        byte[] outArr = new byte[OutArrSize];
+        byte[] outArr = new byte[Config.OutArrSize];
 
         var sc = FromRust.principal_anonymous(
             outArr,
@@ -73,9 +66,9 @@ public class Principal : IEquatable<Principal>
 
         switch (sc)
         {
-            case FromRust.ScOk:
+            case StateCode.Ok:
                 return new Principal(outArr, outArrLen);
-            case FromRust.ScDataOverflow:
+            case StateCode.DataOverflow:
                 throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
             default:
                 throw new UnknownException("Unknown: The StateCode returned is unexpected.");
@@ -84,8 +77,8 @@ public class Principal : IEquatable<Principal>
 
     public static Principal FromBytes(byte[] bytes)
     {
-        byte[] outArr = new byte[OutArrSize];
-        byte[] outErrInfo = new byte[OutErrInfoSize];
+        byte[] outArr = new byte[Config.OutArrSize];
+        byte[] outErrInfo = new byte[Config.OutErrInfoSize];
 
         var sc = FromRust.principal_from_bytes(
             bytes,
@@ -99,15 +92,15 @@ public class Principal : IEquatable<Principal>
 
         switch (sc)
         {
-            case FromRust.ScOk:
+            case StateCode.Ok:
                 return new Principal(outArr, outArrLen);
-            case FromRust.ScDataOverflow:
+            case StateCode.DataOverflow:
                 throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
-            case FromRust.ScInternalErr:
-                var len = Array.IndexOf(outErrInfo, NullTerminated);
+            case StateCode.InternalErr:
+                var len = Array.IndexOf(outErrInfo, Config.NullTerminated);
                 var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
                 throw new InternalErrorException($"Internal: {errInfo}");
-            case FromRust.ScErrInfoOverflow:
+            case StateCode.ErrInfoOverflow:
                 throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
             default:
                 throw new UnknownException("Unknown: The StateCode returned is unexpected.");
@@ -116,8 +109,8 @@ public class Principal : IEquatable<Principal>
 
     public static Principal FromText(string text)
     {
-        byte[] outArr = new byte[OutArrSize];
-        byte[] outErrInfo = new byte[OutErrInfoSize];
+        byte[] outArr = new byte[Config.OutArrSize];
+        byte[] outErrInfo = new byte[Config.OutErrInfoSize];
 
         var sc = FromRust.principal_from_text(
             text,
@@ -130,15 +123,15 @@ public class Principal : IEquatable<Principal>
 
         switch (sc)
         {
-            case FromRust.ScOk:
+            case StateCode.Ok:
                 return new Principal(outArr, outArrLen);
-            case FromRust.ScDataOverflow:
+            case StateCode.DataOverflow:
                 throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
-            case FromRust.ScInternalErr:
-                var len = Array.IndexOf(outErrInfo, NullTerminated);
+            case StateCode.InternalErr:
+                var len = Array.IndexOf(outErrInfo, Config.NullTerminated);
                 var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
                 throw new InternalErrorException($"Internal: {errInfo}");
-            case FromRust.ScErrInfoOverflow:
+            case StateCode.ErrInfoOverflow:
                 throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
             default:
                 throw new UnknownException("Unknown: The StateCode returned is unexpected.");
@@ -147,8 +140,8 @@ public class Principal : IEquatable<Principal>
 
     public override string ToString()
     {
-        byte[] outText = new byte[OutTextSize];
-        byte[] outErrInfo = new byte[OutErrInfoSize];
+        byte[] outText = new byte[Config.OutTextSize];
+        byte[] outErrInfo = new byte[Config.OutErrInfoSize];
 
         var sc = FromRust.principal_to_text(
             Bytes,
@@ -161,21 +154,21 @@ public class Principal : IEquatable<Principal>
 
         switch (sc)
         {
-            case FromRust.ScOk:
+            case StateCode.Ok:
             {
-                var len = Array.IndexOf(outText, NullTerminated);
+                var len = Array.IndexOf(outText, Config.NullTerminated);
                 var principalText = System.Text.Encoding.ASCII.GetString(outText, 0, len);
                 return principalText;
             }
-            case FromRust.ScDataOverflow:
+            case StateCode.DataOverflow:
                 throw new DataOverflowException("Data Overflow: Unable to take off the data of principal text.");
-            case FromRust.ScInternalErr:
+            case StateCode.InternalErr:
             {
-                var len = Array.IndexOf(outErrInfo, NullTerminated);
+                var len = Array.IndexOf(outErrInfo, Config.NullTerminated);
                 var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
                 throw new InternalErrorException($"Internal: {errInfo}");
             }
-            case FromRust.ScErrInfoOverflow:
+            case StateCode.ErrInfoOverflow:
                 throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
             default:
                 throw new UnknownException("Unknown: The StateCode returned is unexpected.");
@@ -202,11 +195,6 @@ public class Principal : IEquatable<Principal>
 
     internal static class FromRust
     {
-        internal const StateCode ScOk = 0;
-        internal const StateCode ScDataOverflow = -1;
-        internal const StateCode ScInternalErr = -2;
-        internal const StateCode ScErrInfoOverflow = -3;
-
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
         internal static extern StateCode principal_management_canister(
             byte[] outArr,
@@ -239,7 +227,7 @@ public class Principal : IEquatable<Principal>
             out UInt32 outArrLen,
             UInt32 arrSize,
             byte[] outErrInfo,
-            UInt32 arrInfoSize
+            UInt32 errInfoSize
         );
 
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
