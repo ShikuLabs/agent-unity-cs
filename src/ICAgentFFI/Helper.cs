@@ -6,11 +6,34 @@ public enum StateCode
     Err = -1,
 }
 
-public static class Config
+internal class FailedCallingRust : Exception
 {
-    public const byte NullTerminated = 0;
-    
-    public const UInt32 OutArrSize = 32;
-    public const UInt32 OutTextSize = 128;
-    public const UInt32 OutErrInfoSize = 256;
+    public FailedCallingRust()
+    {
+    }
+
+    public FailedCallingRust(string message) : base(message)
+    {
+    }
+
+    public FailedCallingRust(string message, Exception inner) : base(message, inner)
+    {
+    }
 }
+
+internal class ErrorFromRust : Exception
+{
+    public ErrorFromRust()
+    {
+    }
+
+    public ErrorFromRust(string message) : base(message)
+    {
+    }
+
+    public ErrorFromRust(string message, Exception inner) : base(message, inner)
+    {
+    }
+}
+
+internal delegate void UnsizedCallback(IntPtr data, Int32 len);

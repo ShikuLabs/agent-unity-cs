@@ -15,8 +15,8 @@ public class Principal : IEquatable<Principal>
     public static Principal ManagementCanister()
     {
         byte[]? outBytes = null;
-        
-        FromRust.UnsizedCallback retCb = (data, len) =>
+
+        UnsizedCallback retCb = (data, len) =>
         {
             outBytes = new byte[len];
             Marshal.Copy(data, outBytes, 0, len);
@@ -32,14 +32,14 @@ public class Principal : IEquatable<Principal>
     public static Principal SelfAuthenticating(byte[] publicKey)
     {
         byte[]? outBytes = null;
-        
-        FromRust.UnsizedCallback retCb = (data, len) =>
+
+        UnsizedCallback retCb = (data, len) =>
         {
             outBytes = new byte[len];
             Marshal.Copy(data, outBytes, 0, len);
         };
         FromRust.principal_self_authenticating(publicKey, publicKey.Length, retCb);
-        
+
         if (outBytes == null)
             throw new FailedCallingRust("Failed on calling function of rust.");
 
@@ -49,8 +49,8 @@ public class Principal : IEquatable<Principal>
     public static Principal Anonymous()
     {
         byte[]? outBytes = null;
-        
-        FromRust.UnsizedCallback retCb = (data, len) =>
+
+        UnsizedCallback retCb = (data, len) =>
         {
             outBytes = new byte[len];
             Marshal.Copy(data, outBytes, 0, len);
@@ -67,13 +67,13 @@ public class Principal : IEquatable<Principal>
     {
         byte[]? outBytes = null;
         string? outError = null;
-        
-        FromRust.UnsizedCallback retCb = (data, len) =>
+
+        UnsizedCallback retCb = (data, len) =>
         {
             outBytes = new byte[len];
             Marshal.Copy(data, outBytes, 0, len);
         };
-        FromRust.UnsizedCallback errCb = (data, len) =>
+        UnsizedCallback errCb = (data, len) =>
         {
             outError = Marshal.PtrToStringAnsi(data);
         };
@@ -99,13 +99,13 @@ public class Principal : IEquatable<Principal>
     {
         byte[]? outBytes = null;
         string? outError = null;
-        
-        FromRust.UnsizedCallback retCb = (data, len) =>
+
+        UnsizedCallback retCb = (data, len) =>
         {
             outBytes = new byte[len];
             Marshal.Copy(data, outBytes, 0, len);
         };
-        FromRust.UnsizedCallback errCb = (data, len) =>
+        UnsizedCallback errCb = (data, len) =>
         {
             outError = Marshal.PtrToStringAnsi(data);
         };
@@ -131,12 +131,12 @@ public class Principal : IEquatable<Principal>
     {
         string? outTexts = null;
         string? outError = null;
-        
-        FromRust.UnsizedCallback retCb = (data, len) =>
+
+        UnsizedCallback retCb = (data, len) =>
         {
             outTexts = Marshal.PtrToStringAnsi(data);
         };
-        FromRust.UnsizedCallback errCb = (data, len) =>
+        UnsizedCallback errCb = (data, len) =>
         {
             outError = Marshal.PtrToStringAnsi(data);
         };
@@ -178,8 +178,6 @@ public class Principal : IEquatable<Principal>
 
     internal static class FromRust
     {
-        internal delegate void UnsizedCallback(IntPtr data, Int32 len);
-        
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
         internal static extern void principal_management_canister(
             [MarshalAs(UnmanagedType.FunctionPtr)] UnsizedCallback retCb
@@ -207,7 +205,7 @@ public class Principal : IEquatable<Principal>
 
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
         internal static extern StateCode principal_from_text(
-            string text,
+            [MarshalAs(UnmanagedType.LPStr)] string text,
             UnsizedCallback retCb,
             UnsizedCallback errCb
         );
@@ -219,35 +217,5 @@ public class Principal : IEquatable<Principal>
             UnsizedCallback retCb,
             UnsizedCallback errCb
         );
-    }
-}
-
-public class FailedCallingRust : Exception
-{
-    public FailedCallingRust()
-    {
-    }
-
-    public FailedCallingRust(string message) : base(message)
-    {
-    }
-
-    public FailedCallingRust(string message, Exception inner) : base(message, inner)
-    {
-    }
-}
-
-public class ErrorFromRust : Exception
-{
-    public ErrorFromRust()
-    {
-    }
-
-    public ErrorFromRust(string message) : base(message)
-    {
-    }
-
-    public ErrorFromRust(string message, Exception inner) : base(message, inner)
-    {
     }
 }

@@ -4,197 +4,235 @@ using System.Runtime.InteropServices;
 
 public class Identity
 {
-    // private IntPtr[] fptr;
-    //
-    // public IdentityType Type { get; }
-    //
-    // private Identity(IntPtr[] fptr, IdentityType type)
-    // {
-    //     this.fptr = fptr;
-    //     this.Type = type;
-    // }
-    //
-    // ~Identity()
-    // {
-    //     FromRust.identity_free(fptr);
-    // }
-    //
-    // /// <summary>
-    // /// Create an [`Identity`] with `Anonymous` type.
-    // /// </summary>
-    // public static Identity Anonymous()
-    // {
-    //     var outFptr = new IntPtr[2];
-    //
-    //     FromRust.identity_anonymous(outFptr);
-    //
-    //     return new Identity(outFptr, IdentityType.Anonymous);
-    // }
-    //
-    // /// <summary>
-    // /// Create an [`Identity`] with `Basic` type.
-    // /// </summary>
-    // public static Identity BasicRandom()
-    // {
-    //     var outFptr = new IntPtr[2];
-    //     var outErrInfo = new byte[Config.OutErrInfoSize];
-    //
-    //     var sc = FromRust.identity_basic_random(outFptr, outErrInfo, (UInt32)outErrInfo.Length);
-    //     
-    //     switch (sc)
-    //     {
-    //         case StateCode.Ok:
-    //             return new Identity(outFptr, IdentityType.Basic);
-    //         case StateCode.DataOverflow:
-    //             throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
-    //         case StateCode.InternalErr:
-    //             var len = Array.IndexOf(outErrInfo, Config.NullTerminated);
-    //             var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
-    //             throw new InternalErrorException($"Internal: {errInfo}");
-    //         case StateCode.ErrInfoOverflow:
-    //             throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
-    //         default:
-    //             throw new UnknownException("Unknown: The StateCode returned is unexpected.");
-    //     }
-    // }
-    //
-    // /// <summary>
-    // /// Create an [`Identity`] with `Secp256k1` type.
-    // /// </summary>
-    // public static Identity Secp256k1Random()
-    // {
-    //     var outFptr = new IntPtr[2];
-    //     var outErrInfo = new byte[Config.OutErrInfoSize];
-    //
-    //     var sc = FromRust.identity_secp256k1_random(outFptr, outErrInfo, (UInt32)outErrInfo.Length);
-    //     
-    //     switch (sc)
-    //     {
-    //         case StateCode.Ok:
-    //             return new Identity(outFptr, IdentityType.Secp256K1);
-    //         case StateCode.DataOverflow:
-    //             throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
-    //         case StateCode.InternalErr:
-    //             var len = Array.IndexOf(outErrInfo, Config.NullTerminated);
-    //             var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
-    //             throw new InternalErrorException($"Internal: {errInfo}");
-    //         case StateCode.ErrInfoOverflow:
-    //             throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
-    //         default:
-    //             throw new UnknownException("Unknown: The StateCode returned is unexpected.");
-    //     }
-    // }
-    //
-    // public Principal Sender()
-    // {
-    //     byte[] outArr = new byte[Config.OutArrSize];
-    //     byte[] outErrInfo = new byte[Config.OutErrInfoSize];
-    //
-    //     var sc = FromRust.identity_sender(
-    //         fptr,
-    //         outArr,
-    //         out UInt32 outArrLen,
-    //         (UInt32)outArr.Length,
-    //         outErrInfo,
-    //         (UInt32)outErrInfo.Length
-    //     );
-    //     
-    //     switch (sc)
-    //     {
-    //         case StateCode.Ok:
-    //             return new Principal(outArr, outArrLen);
-    //         case StateCode.DataOverflow:
-    //             throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
-    //         case StateCode.InternalErr:
-    //             var len = Array.IndexOf(outErrInfo, Config.NullTerminated);
-    //             var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
-    //             throw new InternalErrorException($"Internal: {errInfo}");
-    //         case StateCode.ErrInfoOverflow:
-    //             throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
-    //         default:
-    //             throw new UnknownException("Unknown: The StateCode returned is unexpected.");
-    //     }
-    // }
-    //
-    // internal static class FromRust
-    // {
-    //     [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-    //     internal static extern StateCode identity_anonymous(IntPtr[] outFPtr);
-    //     
-    //     [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-    //     internal static extern StateCode identity_basic_random(
-    //         IntPtr[] outFPtr,
-    //         byte[] outErrInfo,
-    //         UInt32 errInfoSize
-    //     );
-    //     
-    //     [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-    //     internal static extern StateCode identity_basic_from_pem_file(
-    //         string path,
-    //         IntPtr[] outFPtr,
-    //         byte[] outErrInfo,
-    //         UInt32 errInfoSize
-    //     );
-    //     
-    //     [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-    //     internal static extern StateCode identity_basic_from_pem(
-    //         string pem,
-    //         IntPtr[] outFPtr,
-    //         byte[] outErrInfo,
-    //         UInt32 errInfoSize
-    //     );
-    //     
-    //     [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-    //     internal static extern StateCode identity_secp256k1_random(
-    //         IntPtr[] outFPtr,
-    //         byte[] outErrInfo,
-    //         UInt32 errInfoSize
-    //     );
-    //     
-    //     [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-    //     internal static extern StateCode identity_secp256k1_from_pem_file(
-    //         string path,
-    //         IntPtr[] outFPtr,
-    //         byte[] outErrInfo,
-    //         UInt32 errInfoSize
-    //     );
-    //     
-    //     [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-    //     internal static extern StateCode identity_secp256k1_from_pem(
-    //         string pem,
-    //         IntPtr[] outFPtr,
-    //         byte[] outErrInfo,
-    //         UInt32 errInfoSize
-    //     );
-    //     
-    //     [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-    //     internal static extern StateCode identity_sender(
-    //         IntPtr[] fptr,
-    //         byte[] outArr,
-    //         out UInt32 outArrLen,
-    //         UInt32 arrSize,
-    //         byte[] outErrInfo,
-    //         UInt32 errInfoSize
-    //     );
-    //     
-    //     [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-    //     internal static extern StateCode identity_sign(
-    //         IntPtr[] fptr,
-    //         byte[] bytes,
-    //         UInt32 bytesLen,
-    //         byte[] outPublicKey,
-    //         out UInt32 outPublicKeyLen,
-    //         UInt32 publicKeySize,
-    //         byte[] outSignature,
-    //         out UInt32 outSignatureLen,
-    //         UInt32 signatureSize,
-    //         byte[] outErrInfo,
-    //         UInt32 errInfoSize
-    //     );
-    //     
-    //     [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-    //     internal static extern StateCode identity_free(IntPtr[] fptr);
-    // }
+    private IntPtr[] _p2FPtr;
+
+    public IdentityType Type { get; }
+
+    private Identity(IntPtr[] p2FPtr, IdentityType type)
+    {
+        this._p2FPtr = p2FPtr;
+        this.Type = type;
+    }
+
+    ~Identity()
+    {
+        FromRust.identity_free(_p2FPtr);
+    }
+
+    /// <summary>
+    /// Create an [`Identity`] with `Anonymous` type.
+    /// </summary>
+    public static Identity Anonymous()
+    {
+        var p2FPtr = new IntPtr[2];
+        FromRust.identity_anonymous(p2FPtr);
+
+        return new Identity(p2FPtr, IdentityType.Anonymous);
+    }
+
+    /// <summary>
+    /// Create an [`Identity`] with `Basic` type.
+    /// </summary>
+    public static Identity BasicRandom()
+    {
+        string? outError = null;
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var p2FPtr = new IntPtr[2];
+
+        var sc = FromRust.identity_basic_random(p2FPtr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new Identity(p2FPtr, IdentityType.Basic);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public static Identity BasicFromPem(string pem)
+    {
+        string? outError = null;
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var p2FPtr = new IntPtr[2];
+
+        var sc = FromRust.identity_basic_from_pem(pem, p2FPtr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new Identity(p2FPtr, IdentityType.Basic);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    /// <summary>
+    /// Create an [`Identity`] with `Secp256k1` type.
+    /// </summary>
+    public static Identity Secp256K1Random()
+    {
+        var p2FPtr = new IntPtr[2];
+        FromRust.identity_secp256k1_random(p2FPtr);
+
+        return new Identity(p2FPtr, IdentityType.Secp256K1);
+    }
+
+    public static Identity Secp256K1FromPem(string pem)
+    {
+        string? outError = null;
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var p2FPtr = new IntPtr[2];
+
+        var sc = FromRust.identity_secp256k1_from_pem(pem, p2FPtr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new Identity(p2FPtr, IdentityType.Secp256K1);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public Principal Sender()
+    {
+        byte[]? outBytes = null;
+        string? outError = null;
+
+        UnsizedCallback retCb = (data, len) =>
+        {
+            outBytes = new byte[len];
+            Marshal.Copy(data, outBytes, 0, len);
+        };
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var sc = FromRust.identity_sender(_p2FPtr, retCb, errCb);
+
+        if (sc == StateCode.Ok)
+        {
+            if (outBytes == null)
+                throw new FailedCallingRust("Failed on calling function of rust.");
+            else
+                return new Principal(outBytes);
+        }
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public (byte[], byte[]) Sign(byte[] bytes)
+    {
+        byte[]? publicKey = null;
+        byte[]? signature = null;
+        string? outError = null;
+
+        UnsizedCallback pubKeyCb = (data, len) =>
+        {
+            publicKey = new byte[len];
+            Marshal.Copy(data, publicKey, 0, len);
+        };
+        UnsizedCallback sigCb = (data, len) =>
+        {
+            signature = new byte[len];
+            Marshal.Copy(data, signature, 0, len);
+        };
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var sc = FromRust.identity_sign(bytes, bytes.Length, _p2FPtr, pubKeyCb, sigCb, errCb);
+
+        if (sc == StateCode.Ok)
+        {
+            if (publicKey == null || signature == null)
+                throw new FailedCallingRust("Failed on calling function of rust.");
+            else
+                return (publicKey, signature);
+        }
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    internal static class FromRust
+    {
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void identity_anonymous(IntPtr[] p2FPtr);
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode identity_basic_random(
+            IntPtr[] p2FPtr,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode identity_basic_from_pem(
+            [MarshalAs(UnmanagedType.LPStr)] string pem,
+            IntPtr[] p2FPtr,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void identity_secp256k1_random(IntPtr[] p2FPtr);
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode identity_secp256k1_from_pem(
+            [MarshalAs(UnmanagedType.LPStr)] string pem,
+            IntPtr[] p2FPtr,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode identity_sender(
+            IntPtr[] p2FPtr,
+            UnsizedCallback retCb,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode identity_sign(
+            byte[] bytes,
+            Int32 bytesLen,
+            IntPtr[] p2FPtr,
+            UnsizedCallback pubKeyCb,
+            UnsizedCallback sigCb,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode identity_free(IntPtr[] p2FPtr);
+    }
 }
 
 public enum IdentityType
