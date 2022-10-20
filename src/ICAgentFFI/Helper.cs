@@ -3,9 +3,7 @@ namespace ICAgentFFI;
 public enum StateCode
 {
     Ok = 0,
-    DataOverflow = -1,
-    InternalErr = -2,
-    ErrInfoOverflow = -3,
+    Err = -1,
 }
 
 public static class Config

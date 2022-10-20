@@ -7,182 +7,154 @@ public class Principal : IEquatable<Principal>
 {
     public byte[] Bytes { get; }
 
-    internal Principal(byte[] arr, UInt32 arrLen)
+    internal Principal(byte[] data)
     {
-        var bytes = new byte[arrLen];
-        Array.Copy(arr, bytes, arrLen);
-        Bytes = bytes;
+        Bytes = data;
     }
 
-    public static Principal ManagementCanister(uint outArrSize = Config.OutArrSize)
+    public static Principal ManagementCanister()
     {
-        byte[] outArr = new byte[outArrSize];
-
-        var sc = FromRust.principal_management_canister(outArr, out UInt32 outArrLen, (UInt32)outArr.Length);
-
-        switch (sc)
+        byte[]? outBytes = null;
+        
+        FromRust.UnsizedCallback retCb = (data, len) =>
         {
-            case StateCode.Ok:
-                return new Principal(outArr, outArrLen);
-            case StateCode.DataOverflow:
-                throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
-            default:
-                throw new UnknownException("Unknown: The StateCode returned is unexpected.");
+            outBytes = new byte[len];
+            Marshal.Copy(data, outBytes, 0, len);
+        };
+        FromRust.principal_management_canister(retCb);
+
+        if (outBytes == null)
+            throw new FailedCallingRust("Failed on calling function of rust.");
+
+        return new Principal(outBytes);
+    }
+
+    public static Principal SelfAuthenticating(byte[] publicKey)
+    {
+        byte[]? outBytes = null;
+        
+        FromRust.UnsizedCallback retCb = (data, len) =>
+        {
+            outBytes = new byte[len];
+            Marshal.Copy(data, outBytes, 0, len);
+        };
+        FromRust.principal_self_authenticating(publicKey, publicKey.Length, retCb);
+        
+        if (outBytes == null)
+            throw new FailedCallingRust("Failed on calling function of rust.");
+
+        return new Principal(outBytes);
+    }
+
+    public static Principal Anonymous()
+    {
+        byte[]? outBytes = null;
+        
+        FromRust.UnsizedCallback retCb = (data, len) =>
+        {
+            outBytes = new byte[len];
+            Marshal.Copy(data, outBytes, 0, len);
+        };
+        FromRust.principal_anonymous(retCb);
+
+        if (outBytes == null)
+            throw new FailedCallingRust("Failed on calling function of rust.");
+
+        return new Principal(outBytes);
+    }
+
+    public static Principal FromBytes(byte[] bytes)
+    {
+        byte[]? outBytes = null;
+        string? outError = null;
+        
+        FromRust.UnsizedCallback retCb = (data, len) =>
+        {
+            outBytes = new byte[len];
+            Marshal.Copy(data, outBytes, 0, len);
+        };
+        FromRust.UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+        var sc = FromRust.principal_from_bytes(bytes, bytes.Length, retCb, errCb);
+
+        if (sc == StateCode.Ok)
+        {
+            if (outBytes == null)
+                throw new FailedCallingRust("Failed on calling function of rust.");
+            else
+                return new Principal(outBytes);
+        }
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
         }
     }
 
-    public static Principal SelfAuthenticating(byte[] publicKey, uint outArrSize = Config.OutArrSize)
+    public static Principal FromText(string text)
     {
-        byte[] outArr = new byte[outArrSize];
-
-        var sc = FromRust.principal_self_authenticating(
-            outArr,
-            out UInt32 outArrLen,
-            (UInt32)outArr.Length,
-            publicKey,
-            (UInt32)publicKey.Length
-        );
-
-        switch (sc)
+        byte[]? outBytes = null;
+        string? outError = null;
+        
+        FromRust.UnsizedCallback retCb = (data, len) =>
         {
-            case StateCode.Ok:
-                return new Principal(outArr, outArrLen);
-            case StateCode.DataOverflow:
-                throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
-            default:
-                throw new UnknownException("Unknown: The StateCode returned is unexpected.");
+            outBytes = new byte[len];
+            Marshal.Copy(data, outBytes, 0, len);
+        };
+        FromRust.UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+        var sc = FromRust.principal_from_text(text, retCb, errCb);
+
+        if (sc == StateCode.Ok)
+        {
+            if (outBytes == null)
+                throw new FailedCallingRust("Failed on calling function of rust.");
+            else
+                return new Principal(outBytes);
+        }
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
         }
     }
 
-    public static Principal Anonymous(uint outArrSize = Config.OutArrSize)
+    public override string ToString()
     {
-        byte[] outArr = new byte[outArrSize];
-
-        var sc = FromRust.principal_anonymous(
-            outArr,
-            out UInt32 outArrLen,
-            (UInt32)outArr.Length
-        );
-
-        switch (sc)
+        string? outTexts = null;
+        string? outError = null;
+        
+        FromRust.UnsizedCallback retCb = (data, len) =>
         {
-            case StateCode.Ok:
-                return new Principal(outArr, outArrLen);
-            case StateCode.DataOverflow:
-                throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
-            default:
-                throw new UnknownException("Unknown: The StateCode returned is unexpected.");
+            outTexts = Marshal.PtrToStringAnsi(data);
+        };
+        FromRust.UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+        var sc = FromRust.principal_to_text(Bytes, Bytes.Length, retCb, errCb);
+
+        if (sc == StateCode.Ok)
+        {
+            if (outTexts == null)
+                throw new FailedCallingRust("Failed on calling function of rust.");
+            else
+                return outTexts;
         }
-    }
-
-    public static Principal FromBytes(
-        byte[] bytes,
-        uint outArrSize = Config.OutArrSize,
-        uint outErrInfoSize = Config.OutErrInfoSize
-    )
-    {
-        byte[] outArr = new byte[outArrSize];
-        byte[] outErrInfo = new byte[outErrInfoSize];
-
-        var sc = FromRust.principal_from_bytes(
-            bytes,
-            (UInt32)bytes.Length,
-            outArr,
-            out UInt32 outArrLen,
-            (UInt32)outArr.Length,
-            outErrInfo,
-            (UInt32)outErrInfo.Length
-        );
-
-        switch (sc)
+        else
         {
-            case StateCode.Ok:
-                return new Principal(outArr, outArrLen);
-            case StateCode.DataOverflow:
-                throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
-            case StateCode.InternalErr:
-                var len = Array.IndexOf(outErrInfo, Config.NullTerminated);
-                var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
-                throw new InternalErrorException($"Internal: {errInfo}");
-            case StateCode.ErrInfoOverflow:
-                throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
-            default:
-                throw new UnknownException("Unknown: The StateCode returned is unexpected.");
-        }
-    }
-
-    public static Principal FromText(
-        string text,
-        uint outArrSize = Config.OutArrSize,
-        uint outErrInfoSize = Config.OutErrInfoSize
-    )
-    {
-        byte[] outArr = new byte[outArrSize];
-        byte[] outErrInfo = new byte[Config.OutErrInfoSize];
-
-        var sc = FromRust.principal_from_text(
-            text,
-            outArr,
-            out UInt32 outArrLen,
-            (UInt32)outArr.Length,
-            outErrInfo,
-            (UInt32)outErrInfo.Length
-        );
-
-        switch (sc)
-        {
-            case StateCode.Ok:
-                return new Principal(outArr, outArrLen);
-            case StateCode.DataOverflow:
-                throw new DataOverflowException("Data Overflow: Unable to take off the data of principal bytes.");
-            case StateCode.InternalErr:
-                var len = Array.IndexOf(outErrInfo, Config.NullTerminated);
-                var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
-                throw new InternalErrorException($"Internal: {errInfo}");
-            case StateCode.ErrInfoOverflow:
-                throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
-            default:
-                throw new UnknownException("Unknown: The StateCode returned is unexpected.");
-        }
-    }
-
-    public string ToText(
-        uint outTextSize = Config.OutTextSize,
-        uint outErrInfoSize = Config.OutErrInfoSize
-    )
-    {
-        byte[] outText = new byte[outTextSize];
-        byte[] outErrInfo = new byte[outErrInfoSize];
-
-        var sc = FromRust.principal_to_text(
-            Bytes,
-            (UInt32)Bytes.Length,
-            outText,
-            (UInt32)outText.Length,
-            outErrInfo,
-            (UInt32)outErrInfo.Length
-        );
-
-        switch (sc)
-        {
-            case StateCode.Ok:
-            {
-                var len = Array.IndexOf(outText, Config.NullTerminated);
-                var principalText = System.Text.Encoding.ASCII.GetString(outText, 0, len);
-                return principalText;
-            }
-            case StateCode.DataOverflow:
-                throw new DataOverflowException("Data Overflow: Unable to take off the data of principal text.");
-            case StateCode.InternalErr:
-            {
-                var len = Array.IndexOf(outErrInfo, Config.NullTerminated);
-                var errInfo = System.Text.Encoding.ASCII.GetString(outErrInfo, 0, len);
-                throw new InternalErrorException($"Internal: {errInfo}");
-            }
-            case StateCode.ErrInfoOverflow:
-                throw new ErrInfoOverflowException("ErrInfo Overflow: Unable to take off the data of error.");
-            default:
-                throw new UnknownException("Unknown: The StateCode returned is unexpected.");
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
         }
     }
 
@@ -206,119 +178,76 @@ public class Principal : IEquatable<Principal>
 
     internal static class FromRust
     {
+        internal delegate void UnsizedCallback(IntPtr data, Int32 len);
+        
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern StateCode principal_management_canister(
-            byte[] outArr,
-            out UInt32 outArrLen,
-            UInt32 arrSize
+        internal static extern void principal_management_canister(
+            [MarshalAs(UnmanagedType.FunctionPtr)] UnsizedCallback retCb
         );
 
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern StateCode principal_self_authenticating(
-            byte[] outArr,
-            out UInt32 outArrLen,
-            UInt32 arrSize,
+        internal static extern void principal_self_authenticating(
             byte[] publicKey,
-            UInt32 publicKeySize
+            Int32 publicKeyLen,
+            [MarshalAs(UnmanagedType.FunctionPtr)] UnsizedCallback retCb
         );
 
-        [DllImport("ic-agent-ffi",
-            CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
         internal static extern StateCode principal_anonymous(
-            byte[] outArr,
-            out UInt32 outArrLen,
-            UInt32 arrLen
+            [MarshalAs(UnmanagedType.FunctionPtr)] UnsizedCallback retCb
         );
 
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
         internal static extern StateCode principal_from_bytes(
             byte[] bytes,
-            UInt32 bytesSize,
-            byte[] outArr,
-            out UInt32 outArrLen,
-            UInt32 arrSize,
-            byte[] outErrInfo,
-            UInt32 errInfoSize
+            Int32 bytesLen,
+            UnsizedCallback retCb,
+            UnsizedCallback errCb
         );
 
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
         internal static extern StateCode principal_from_text(
             string text,
-            byte[] outArr,
-            out UInt32 outArrLen,
-            UInt32 arrSize,
-            byte[] outErrInfo,
-            UInt32 errInfoSize
+            UnsizedCallback retCb,
+            UnsizedCallback errCb
         );
 
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
         internal static extern StateCode principal_to_text(
             byte[] bytes,
-            UInt32 bytesSize,
-            byte[] outText,
-            UInt32 textSize,
-            byte[] outErrInfo,
-            UInt32 errInfoSize
+            Int32 bytesLen,
+            UnsizedCallback retCb,
+            UnsizedCallback errCb
         );
     }
 }
 
-public class DataOverflowException : Exception
+public class FailedCallingRust : Exception
 {
-    public DataOverflowException()
+    public FailedCallingRust()
     {
     }
 
-    public DataOverflowException(string message) : base(message)
+    public FailedCallingRust(string message) : base(message)
     {
     }
 
-    public DataOverflowException(string message, Exception inner) : base(message, inner)
+    public FailedCallingRust(string message, Exception inner) : base(message, inner)
     {
     }
 }
 
-public class InternalErrorException : Exception
+public class ErrorFromRust : Exception
 {
-    public InternalErrorException()
+    public ErrorFromRust()
     {
     }
 
-    public InternalErrorException(string message) : base(message)
+    public ErrorFromRust(string message) : base(message)
     {
     }
 
-    public InternalErrorException(string message, Exception inner) : base(message, inner)
-    {
-    }
-}
-
-public class ErrInfoOverflowException : Exception
-{
-    public ErrInfoOverflowException()
-    {
-    }
-
-    public ErrInfoOverflowException(string message) : base(message)
-    {
-    }
-
-    public ErrInfoOverflowException(string message, Exception inner) : base(message, inner)
-    {
-    }
-}
-
-public class UnknownException : Exception
-{
-    public UnknownException()
-    {
-    }
-
-    public UnknownException(string message) : base(message)
-    {
-    }
-
-    public UnknownException(string message, Exception inner) : base(message, inner)
+    public ErrorFromRust(string message, Exception inner) : base(message, inner)
     {
     }
 }
