@@ -64,7 +64,7 @@ N3d26cRxD99TPtm8uo2OuzKhSiq6EQ==
 
         Assert.Equal(IdentityType.Secp256K1, identity.Type);
     }
-    
+
     [Fact]
     public void Secp256K1FromPem_ShouldWork()
     {
@@ -76,7 +76,7 @@ N3d26cRxD99TPtm8uo2OuzKhSiq6EQ==
             identity.Sender().ToString()
         );
     }
-    
+
     [Fact]
     public void Sender_ShouldWork()
     {
@@ -86,11 +86,12 @@ N3d26cRxD99TPtm8uo2OuzKhSiq6EQ==
         Assert.Equal(principal, Principal.Anonymous());
     }
 
+    [Fact]
     public void Sign_ShouldWork()
     {
         var basic = Identity.BasicFromPem(BasicIdentityFile);
-        var (pubKey, signature) = basic.Sign(new byte[] {});
-        
+        var (pubKey, signature) = basic.Sign(new byte[] { });
+
         Assert.Equal(PubKeyExpected, pubKey);
         Assert.Equal(SignatureExpected, signature);
     }

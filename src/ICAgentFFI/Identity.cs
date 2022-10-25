@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 public class Identity
 {
-    private IntPtr[] _p2FPtr;
+    internal IntPtr[] _p2FPtr;
 
     public IdentityType Type { get; }
 

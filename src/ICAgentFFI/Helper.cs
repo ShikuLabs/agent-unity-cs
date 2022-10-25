@@ -6,7 +6,7 @@ public enum StateCode
     Err = -1,
 }
 
-internal class FailedCallingRust : Exception
+public class FailedCallingRust : Exception
 {
     public FailedCallingRust()
     {
@@ -21,7 +21,7 @@ internal class FailedCallingRust : Exception
     }
 }
 
-internal class ErrorFromRust : Exception
+public class ErrorFromRust : Exception
 {
     public ErrorFromRust()
     {
