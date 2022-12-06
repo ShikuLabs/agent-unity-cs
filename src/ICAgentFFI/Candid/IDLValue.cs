@@ -1,14 +1,13 @@
-using System.Numerics;
-
 namespace ICAgentFFI.Candid;
 
+using System.Numerics;
 using System.Runtime.InteropServices;
 
 public class IDLValue : IEquatable<IDLValue>
 {
     private IntPtr _ptr;
 
-    private IDLValue(IntPtr ptr)
+    internal IDLValue(IntPtr ptr)
     {
         _ptr = ptr;
     }
@@ -170,7 +169,7 @@ public class IDLValue : IEquatable<IDLValue>
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public double AsDouble()
     {
         string? outError = null;
@@ -349,7 +348,7 @@ public class IDLValue : IEquatable<IDLValue>
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public Principal AsPrincipal()
     {
         byte[]? outBytes = null;
@@ -512,7 +511,7 @@ public class IDLValue : IEquatable<IDLValue>
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public byte AsNat8()
     {
         string? outError = null;
@@ -533,7 +532,7 @@ public class IDLValue : IEquatable<IDLValue>
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public UInt16 AsNat16()
     {
         string? outError = null;
@@ -554,7 +553,7 @@ public class IDLValue : IEquatable<IDLValue>
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public UInt32 AsNat32()
     {
         string? outError = null;
@@ -575,7 +574,7 @@ public class IDLValue : IEquatable<IDLValue>
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public UInt64 AsNat64()
     {
         string? outError = null;
@@ -617,7 +616,7 @@ public class IDLValue : IEquatable<IDLValue>
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public Int16 AsInt16()
     {
         string? outError = null;
@@ -638,7 +637,7 @@ public class IDLValue : IEquatable<IDLValue>
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public Int32 AsInt32()
     {
         string? outError = null;
@@ -659,7 +658,7 @@ public class IDLValue : IEquatable<IDLValue>
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public Int64 AsInt64()
     {
         string? outError = null;
@@ -915,7 +914,7 @@ public class IDLValue : IEquatable<IDLValue>
         );
 
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern StateCode idl_value_free(IntPtr ptr2Value);
+        internal static extern void idl_value_free(IntPtr ptr2Value);
     }
 
     public override int GetHashCode()

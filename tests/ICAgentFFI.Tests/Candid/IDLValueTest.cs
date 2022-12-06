@@ -97,7 +97,7 @@ public class IDLValueTest
         var v01 = IDLValue.FromText($"{actual}");
         Assert.Equal(actual, v01.AsNumber());
     }
-    
+
     [Fact]
     public void AsFloat_ShouldWork()
     {
@@ -149,7 +149,7 @@ public class IDLValueTest
     {
         var valueVariant = IDLValue.FromText("variant { Key = true }");
         var (id, value) = valueVariant.AsVariant();
-        
+
         Assert.Equal("Key", id);
         Assert.True(value.AsBool());
     }
@@ -167,14 +167,14 @@ public class IDLValueTest
         var v01 = IDLValue.FromText("service \"2vxsx-fae\"");
         Assert.Equal(Principal.Anonymous(), v01.AsService());
     }
-    
+
     [Fact]
     public void AsFunc_ShouldWork()
     {
         var valueFunc = IDLValue.FromText("func \"2vxsx-fae\".get_info");
 
         var (principal, funcName) = valueFunc.AsFunc();
-        
+
         Assert.Equal(Principal.Anonymous(), principal);
         Assert.Equal("get_info", funcName);
     }
@@ -195,7 +195,7 @@ public class IDLValueTest
         var value = IDLValue.FromText($"{num}: int");
         Assert.Equal(bi, value.AsInt());
     }
-    
+
     [Fact]
     public void AsNat_ShouldWork()
     {
@@ -205,7 +205,7 @@ public class IDLValueTest
         var value = IDLValue.FromText($"{num}: nat");
         Assert.Equal(bi, value.AsNat());
     }
-    
+
     [Fact]
     public void AsNat8_ShouldWork()
     {
@@ -214,7 +214,7 @@ public class IDLValueTest
         var value = IDLValue.FromText($"{num}: nat8");
         Assert.Equal(num, value.AsNat8());
     }
-    
+
     [Fact]
     public void AsNat16_ShouldWork()
     {
@@ -223,7 +223,7 @@ public class IDLValueTest
         var value = IDLValue.FromText($"{num}: nat16");
         Assert.Equal(num, value.AsNat16());
     }
-    
+
     [Fact]
     public void AsNat32_ShouldWork()
     {
@@ -232,7 +232,7 @@ public class IDLValueTest
         var value = IDLValue.FromText($"{num}: nat32");
         Assert.Equal(num, value.AsNat32());
     }
-    
+
     [Fact]
     public void AsNat64_ShouldWork()
     {
@@ -241,7 +241,7 @@ public class IDLValueTest
         var value = IDLValue.FromText($"{num}: nat64");
         Assert.Equal(num, value.AsNat64());
     }
-    
+
     [Fact]
     public void AsInt8_ShouldWork()
     {
@@ -250,7 +250,7 @@ public class IDLValueTest
         var value = IDLValue.FromText($"{num}: int8");
         Assert.Equal(num, value.AsInt8());
     }
-    
+
     [Fact]
     public void AsInt16_ShouldWork()
     {
@@ -259,7 +259,7 @@ public class IDLValueTest
         var value = IDLValue.FromText($"{num}: int16");
         Assert.Equal(num, value.AsInt16());
     }
-    
+
     [Fact]
     public void AsInt32_ShouldWork()
     {
@@ -268,7 +268,7 @@ public class IDLValueTest
         var value = IDLValue.FromText($"{num}: int32");
         Assert.Equal(num, value.AsInt32());
     }
-    
+
     [Fact]
     public void AsInt64_ShouldWork()
     {
