@@ -87,7 +87,7 @@ public class Agent
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public string Update(string funcName, string funcArgs)
     {
         string? outIdlArgs = null;
@@ -124,7 +124,7 @@ public class Agent
                 throw new ErrorFromRust(outError);
         }
     }
-    
+
     public string Status()
     {
         string? outIdlArgs = null;

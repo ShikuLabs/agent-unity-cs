@@ -185,20 +185,20 @@ service : (opt InternetIdentityInit) -> {
 
         Assert.Throws<ErrorFromRust>(() => Agent.Create(MainNet, identity, canisterId, IIDidContent));
     }
-    
+
     [Fact]
     public void CreateWithSecp256K11_ShouldWork()
     {
-      var identity = Identity.Secp256K1Random();
-      var canisterId = Principal.FromText(IICanisterId);
+        var identity = Identity.Secp256K1Random();
+        var canisterId = Principal.FromText(IICanisterId);
 
-      Agent.Create(MainNet, identity, canisterId, IIDidContent);
+        Agent.Create(MainNet, identity, canisterId, IIDidContent);
     }
-    
+
     [Fact]
     public void Query_ShouldWork()
     {
-      const string Expected = @"(
+        const string Expected = @"(
   vec {
     record {
       alias = ""macbook-2021"";
@@ -209,40 +209,40 @@ service : (opt InternetIdentityInit) -> {
     };
   },
 )";
-      
-      var identity = Identity.Secp256K1Random();
-      var canisterId = Principal.FromText(IICanisterId);
 
-      var agent = Agent.Create(MainNet, identity, canisterId, IIDidContent);
+        var identity = Identity.Secp256K1Random();
+        var canisterId = Principal.FromText(IICanisterId);
 
-      var idlStr = agent.Query("lookup", "(1974211: nat64)");
-      
-      Assert.Equal(Expected, idlStr);
+        var agent = Agent.Create(MainNet, identity, canisterId, IIDidContent);
+
+        var idlStr = agent.Query("lookup", "(1974211: nat64)");
+
+        Assert.Equal(Expected, idlStr);
     }
-    
+
     [Fact]
     public void Update_ShouldWork()
     {
-      var identity = Identity.Secp256K1Random();
-      var canisterId = Principal.FromText(IICanisterId);
+        var identity = Identity.Secp256K1Random();
+        var canisterId = Principal.FromText(IICanisterId);
 
-      var agent = Agent.Create(MainNet, identity, canisterId, IIDidContent);
+        var agent = Agent.Create(MainNet, identity, canisterId, IIDidContent);
 
-      var idlStr = agent.Update("create_challenge", "()");
-      
-      Assert.True(idlStr.Length != 0);
+        var idlStr = agent.Update("create_challenge", "()");
+
+        Assert.True(idlStr.Length != 0);
     }
-    
+
     [Fact]
     public void Status_ShouldWork()
     {
-      var identity = Identity.Secp256K1Random();
-      var canisterId = Principal.FromText(IICanisterId);
+        var identity = Identity.Secp256K1Random();
+        var canisterId = Principal.FromText(IICanisterId);
 
-      var agent = Agent.Create(MainNet, identity, canisterId, IIDidContent);
+        var agent = Agent.Create(MainNet, identity, canisterId, IIDidContent);
 
-      var status = agent.Status();
-      
-      Assert.True(status.Length != 0);
+        var status = agent.Status();
+
+        Assert.True(status.Length != 0);
     }
 }
