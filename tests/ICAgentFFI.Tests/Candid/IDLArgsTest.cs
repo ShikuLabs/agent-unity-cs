@@ -43,7 +43,7 @@ public class IDLArgsTest
     }
     
     [Fact]
-    void WithVec_ShouldWork()
+    public void WithVec_ShouldWork()
     {
         IDLValue[] values = new[]
         {

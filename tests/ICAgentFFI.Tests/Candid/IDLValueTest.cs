@@ -25,35 +25,35 @@ public class IDLValueTest
     }
 
     [Fact]
-    void WithNull_ShouldWork()
+    public void WithNull_ShouldWork()
     {
         var valueNull = IDLValue.WithNull();
         Assert.True(valueNull.IsNull());
     }
 
     [Fact]
-    void WithText_ShouldWork()
+    public void WithText_ShouldWork()
     {
         var valueText = IDLValue.WithText("Hello World");
         Assert.Equal("Hello World", valueText.AsText());
     }
 
     [Fact]
-    void WithNumber_ShouldWork()
+    public void WithNumber_ShouldWork()
     {
         var valueNumber = IDLValue.WithNumber("123456789");
         Assert.Equal("123456789", valueNumber.AsNumber());
     }
 
     [Fact]
-    void WithDouble_ShouldWork()
+    public void WithDouble_ShouldWork()
     {
         var valueDouble = IDLValue.WithDouble(1.2345678);
         Assert.Equal(1.2345678, valueDouble.AsDouble());
     }
 
     [Fact]
-    void WithOpt_ShouldWork()
+    public void WithOpt_ShouldWork()
     {
         var valueTrue = IDLValue.WithBool(true);
         var valueOpt = IDLValue.WithOpt(valueTrue);
@@ -62,7 +62,7 @@ public class IDLValueTest
     }
 
     [Fact]
-    void WithVec_ShouldWork()
+    public void WithVec_ShouldWork()
     {
         IDLValue[] values = new[]
         {
@@ -81,7 +81,7 @@ public class IDLValueTest
     }
 
     [Fact]
-    void WithRecord_ShouldWork()
+    public void WithRecord_ShouldWork()
     {
         Dictionary<String, IDLValue> dict = new Dictionary<string, IDLValue>();
         dict.Add("Arg01", IDLValue.WithBool(true));
@@ -95,7 +95,7 @@ public class IDLValueTest
     }
 
     [Fact]
-    void WithVariant_ShouldWork()
+    public void WithVariant_ShouldWork()
     {
         var valueVariant = IDLValue.WithVariant("Arg01", IDLValue.WithBool(true), 64);
         var (key, value) = valueVariant.AsVariant();
@@ -105,21 +105,21 @@ public class IDLValueTest
     }
 
     [Fact]
-    void WithPrincipal_ShouldWork()
+    public void WithPrincipal_ShouldWork()
     {
         var valuePrincipal = IDLValue.WithPrincipal(Principal.ManagementCanister());
         Assert.Equal(Principal.ManagementCanister(), valuePrincipal.AsPrincipal());
     }
 
     [Fact]
-    void WithService_ShouldWork()
+    public void WithService_ShouldWork()
     {
         var valuleService = IDLValue.WithService(Principal.ManagementCanister());
         Assert.Equal(Principal.ManagementCanister(), valuleService.AsService());
     }
 
     [Fact]
-    void WithFunc_ShouldWork()
+    public void WithFunc_ShouldWork()
     {
         var valueFunc = IDLValue.WithFunc(Principal.Anonymous(), "hello_world");
         var (prp, funcName) = valueFunc.AsFunc();
@@ -129,14 +129,14 @@ public class IDLValueTest
     }
 
     [Fact]
-    void WithNone_ShouldWork()
+    public void WithNone_ShouldWork()
     {
         var valueNone = IDLValue.WithNone();
         Assert.True(valueNone.IsNone());
     }
 
     [Fact]
-    void WithInt_ShouldWork()
+    public void WithInt_ShouldWork()
     {
         var bi = BigInteger.Parse("-12345678901234567890");
         var valueInt = IDLValue.WithInt(bi);
@@ -144,7 +144,7 @@ public class IDLValueTest
     }
 
     [Fact]
-    void WithNat_ShouldWork()
+    public void WithNat_ShouldWork()
     {
         var bi = BigInteger.Parse("12345678901234567890");
         var valueNat = IDLValue.WithNat(bi);
@@ -152,70 +152,70 @@ public class IDLValueTest
     }
 
     [Fact]
-    void WithNat8_ShouldWork()
+    public void WithNat8_ShouldWork()
     {
         var value = IDLValue.WithNat8(128);
         Assert.Equal(128, value.AsNat8());
     }
 
     [Fact]
-    void WithNat16_ShouldWork()
+    public void WithNat16_ShouldWork()
     {
         var value = IDLValue.WithNat16(128);
         Assert.Equal(128, value.AsNat16());
     }
 
     [Fact]
-    void WithNat32_ShouldWork()
+    public void WithNat32_ShouldWork()
     {
         var value = IDLValue.WithNat32(128);
         Assert.Equal((UInt32)128, value.AsNat32());
     }
 
     [Fact]
-    void WithNat64_ShouldWork()
+    public void WithNat64_ShouldWork()
     {
         var value = IDLValue.WithNat64(128);
         Assert.Equal((UInt64)128, value.AsNat64());
     }
 
     [Fact]
-    void WithInt8_ShouldWork()
+    public void WithInt8_ShouldWork()
     {
         var value = IDLValue.WithInt8(-127);
         Assert.Equal(-127, value.AsInt8());
     }
 
     [Fact]
-    void WithInt16_ShouldWork()
+    public void WithInt16_ShouldWork()
     {
         var value = IDLValue.WithInt16(-127);
         Assert.Equal(-127, value.AsInt16());
     }
 
     [Fact]
-    void WithInt32_ShouldWork()
+    public void WithInt32_ShouldWork()
     {
         var value = IDLValue.WithInt32(-127);
         Assert.Equal(-127, value.AsInt32());
     }
 
     [Fact]
-    void WithInt64_ShouldWork()
+    public void WithInt64_ShouldWork()
     {
         var value = IDLValue.WithInt64(-127);
         Assert.Equal(-127, value.AsInt64());
     }
 
     [Fact]
-    void WithFloat_ShouldWork()
+    public void WithFloat_ShouldWork()
     {
         var valueFloat = IDLValue.WithFloat((float)1.0);
         Assert.Equal(1.0, valueFloat.AsFloat());
     }
 
     [Fact]
-    void WithReserved_ShouldWork()
+    public void WithReserved_ShouldWork()
     {
         var valueReserved = IDLValue.WithReserved();
         Assert.True(valueReserved.IsReserved());
