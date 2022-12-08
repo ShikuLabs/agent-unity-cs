@@ -74,6 +74,15 @@ public class IDLArgs
         }
     }
 
+    public static IDLArgs WithVec(IDLValue[] values)
+    {
+        var ptrs = values.Select(value => value._ptr).ToArray();
+
+        FromRust.idl_args_ct_vec(ptrs, ptrs.Length, out IntPtr ptr);
+
+        return new IDLArgs(ptr);
+    }
+
     public byte[] ToBytes()
     {
         byte[]? outBytes = null;
@@ -159,6 +168,13 @@ public class IDLArgs
             Int32 bytesLen,
             out IntPtr ptr2Args,
             UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_args_ct_vec(
+            IntPtr[] p2ArrPtr,
+            Int32 arrLen,
+            out IntPtr ptr2Value
         );
 
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]

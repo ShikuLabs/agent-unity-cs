@@ -1,11 +1,12 @@
 namespace ICAgentFFI.Candid;
 
 using System.Numerics;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 public class IDLValue : IEquatable<IDLValue>
 {
-    private IntPtr _ptr;
+    internal IntPtr _ptr;
 
     internal IDLValue(IntPtr ptr)
     {
@@ -31,6 +32,324 @@ public class IDLValue : IEquatable<IDLValue>
             else
                 throw new ErrorFromRust(outError);
         }
+    }
+
+    public static IDLValue WithBool(bool value)
+    {
+        FromRust.idl_value_ct_bool(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithNull()
+    {
+        FromRust.idl_value_ct_null(out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithText(string text)
+    {
+        string? outError = null;
+
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var sc = FromRust.idl_value_ct_text(text, out IntPtr ptr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new IDLValue(ptr);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public static IDLValue WithNumber(string number)
+    {
+        string? outError = null;
+
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var sc = FromRust.idl_value_ct_number(number, out IntPtr ptr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new IDLValue(ptr);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public static IDLValue WithDouble(double value)
+    {
+        FromRust.idl_value_ct_float64(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithOpt(IDLValue value)
+    {
+        FromRust.idl_value_ct_opt(value._ptr, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithVec(IDLValue[] values)
+    {
+        var ptrs = values.Select(value => value._ptr).ToArray();
+
+        FromRust.idl_value_ct_vec(ptrs, ptrs.Length, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithRecord(Dictionary<String, IDLValue> records)
+    {
+        string? outError = null;
+
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        string[] keys = records.Keys.ToArray();
+        IntPtr[] vals = records.Values.Select(value => value._ptr).ToArray();
+
+        var sc = FromRust.idl_value_ct_record(keys, keys.Length, vals, vals.Length, out IntPtr ptr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new IDLValue(ptr);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public static IDLValue WithVariant(string key, IDLValue value, UInt64 index)
+    {
+        string? outError = null;
+
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var sc = FromRust.idl_value_ct_variant(key, value._ptr, index, out IntPtr ptr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new IDLValue(ptr);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public static IDLValue WithPrincipal(Principal principal)
+    {
+        string? outError = null;
+
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var sc = FromRust.idl_value_ct_principal(principal.Bytes, principal.Bytes.Length, out IntPtr ptr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new IDLValue(ptr);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public static IDLValue WithService(Principal principal)
+    {
+        string? outError = null;
+
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var sc = FromRust.idl_value_ct_service(principal.Bytes, principal.Bytes.Length, out IntPtr ptr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new IDLValue(ptr);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public static IDLValue WithFunc(Principal principal, string funcName)
+    {
+        string? outError = null;
+
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var sc = FromRust.idl_value_ct_func(principal.Bytes, principal.Bytes.Length, funcName, out IntPtr ptr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new IDLValue(ptr);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public static IDLValue WithNone()
+    {
+        FromRust.idl_value_ct_none(out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithInt(BigInteger bi)
+    {
+        string? outError = null;
+
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var sc = FromRust.idl_value_ct_int(bi.ToString(), out IntPtr ptr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new IDLValue(ptr);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public static IDLValue WithNat(BigInteger bi)
+    {
+        if (bi < BigInteger.Zero)
+            throw new Exception("Nat must be bigger than 0");
+
+        string? outError = null;
+
+        UnsizedCallback errCb = (data, len) =>
+        {
+            outError = Marshal.PtrToStringAnsi(data);
+        };
+
+        var sc = FromRust.idl_value_ct_nat(bi.ToString(), out IntPtr ptr, errCb);
+
+        if (sc == StateCode.Ok)
+            return new IDLValue(ptr);
+        else
+        {
+            if (outError == null)
+                throw new FailedCallingRust("Failed on getting error from rust.");
+            else
+                throw new ErrorFromRust(outError);
+        }
+    }
+
+    public static IDLValue WithNat8(byte value)
+    {
+        FromRust.idl_value_ct_nat8(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithNat16(UInt16 value)
+    {
+        FromRust.idl_value_ct_nat16(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithNat32(UInt32 value)
+    {
+        FromRust.idl_value_ct_nat32(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithNat64(UInt64 value)
+    {
+        FromRust.idl_value_ct_nat64(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithInt8(sbyte value)
+    {
+        FromRust.idl_value_ct_int8(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithInt16(Int16 value)
+    {
+        FromRust.idl_value_ct_int16(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithInt32(Int32 value)
+    {
+        FromRust.idl_value_ct_int32(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithInt64(Int64 value)
+    {
+        FromRust.idl_value_ct_int64(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithFloat(float value)
+    {
+        FromRust.idl_value_ct_float32(value, out IntPtr ptr);
+
+        return new IDLValue(ptr);
+    }
+
+    public static IDLValue WithReserved()
+    {
+        FromRust.idl_value_ct_reserved(out IntPtr ptr);
+
+        return new IDLValue(ptr);
     }
 
     public bool Equals(IDLValue? idlValue)
@@ -444,13 +763,13 @@ public class IDLValue : IEquatable<IDLValue>
         }
     }
 
-    // public bool IsNone()
-    // {
-    //     UnsizedCallback errCb = (data, len) => { };
-    //     var sc = FromRust.idl_value_is_none(_ptr, errCb);
-    //
-    //     return sc == StateCode.Ok;
-    // }
+    public bool IsNone()
+    {
+        UnsizedCallback errCb = (data, len) => { };
+        var sc = FromRust.idl_value_is_none(_ptr, errCb);
+
+        return sc == StateCode.Ok;
+    }
 
     public BigInteger AsInt()
     {
@@ -722,6 +1041,173 @@ public class IDLValue : IEquatable<IDLValue>
             [MarshalAs(UnmanagedType.LPStr)] string text,
             out IntPtr ptr2Value,
             UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_bool(
+            [MarshalAs(UnmanagedType.Bool)] bool value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_null(
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode idl_value_ct_text(
+            [MarshalAs(UnmanagedType.LPStr)] string text,
+            out IntPtr ptr2Value,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode idl_value_ct_number(
+            [MarshalAs(UnmanagedType.LPStr)] string number,
+            out IntPtr ptr2Value,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_float64(
+            double value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_opt(
+            IntPtr value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_vec(
+            IntPtr[] p2ArrPtr,
+            Int32 arrLen,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode idl_value_ct_record(
+            [MarshalAs(UnmanagedType.LPArray)] string[] keys,
+            Int32 keysLen,
+            IntPtr[] vals,
+            Int32 valsLen,
+            out IntPtr ptr2Value,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode idl_value_ct_variant(
+            [MarshalAs(UnmanagedType.LPStr)] string key,
+            IntPtr valPtr,
+            UInt64 index,
+            out IntPtr ptr2Value,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode idl_value_ct_principal(
+            byte[] bytes,
+            Int32 bytesLen,
+            out IntPtr ptr2Value,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode idl_value_ct_service(
+            byte[] bytes,
+            Int32 bytesLen,
+            out IntPtr ptr2Value,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode idl_value_ct_func(
+            byte[] bytes,
+            Int32 bytesLen,
+            [MarshalAs(UnmanagedType.LPStr)] string funcName,
+            out IntPtr ptr2Value,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_none(
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode idl_value_ct_int(
+            [MarshalAs(UnmanagedType.LPStr)] string value,
+            out IntPtr ptr2Value,
+            UnsizedCallback errCb
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern StateCode idl_value_ct_nat(
+            [MarshalAs(UnmanagedType.LPStr)] string value,
+            out IntPtr ptr2Value,
+            UnsizedCallback errCb
+        );
+
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_nat8(
+            byte value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_nat16(
+            UInt16 value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_nat32(
+            UInt32 value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_nat64(
+            UInt64 value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_int8(
+            sbyte value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_int16(
+            Int16 value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_int32(
+            Int32 value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_int64(
+            Int64 value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_float32(
+            float value,
+            out IntPtr ptr2Value
+        );
+
+        [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void idl_value_ct_reserved(
+            out IntPtr ptr2Value
         );
 
         [DllImport("ic-agent-ffi", CallingConvention = CallingConvention.Cdecl)]
